@@ -2,8 +2,11 @@ import sys
 import pandas as pd
 
 from CalculateModule import calculate_power
-from const import difficulty_constant
+from const import difficulty_constant, new_DLC
 from SongModule import load_dataframe, filter_songs
+from utils import resource_path
+
+import functools
 
 from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QLabel, QLineEdit, QPushButton, QTextEdit, \
     QTableWidgetItem, QHBoxLayout, QTableWidget, QHeaderView, QScrollArea, QRadioButton, QListWidget, QSpacerItem, QSizePolicy
@@ -17,10 +20,20 @@ for difficulty, constant in difficulty_constant.items():
             results[difficulty] = []
         results[difficulty].append((accuracy, result))
 
-songs_df = load_dataframe('DJMAX RESPECT V 2.0 _ Pattern Data.xlsx')
+songs_df = load_dataframe(resource_path('PatternData.xlsx'))
 DLC_KEY = 'DLC_Unnamed: 1_level_1'
 SONGNAME_KEY = '곡명_Unnamed: 2_level_1'
 
+def compare(x, y):
+    value_x = difficulty_constant[x[0]]
+    value_y = difficulty_constant[y[0]]
+
+    if value_x > value_y:
+        return -1
+    elif value_x < value_y:
+        return 1
+    else:
+        return 0
 class PowerApp(QWidget):
     def __init__(self):
         super().__init__()
@@ -137,7 +150,19 @@ class PowerApp(QWidget):
                 label = QLabel(f"{key} : -", self)
                 self.nhm_layout.addWidget(label)
                 self.middle_labels[key] = label
-        
+    
+    def keyChecked(self):
+        btn_mode = 4
+        if self.b4.isChecked():
+            btn_mode = 4
+        elif self.b5.isChecked():
+            btn_mode = 5
+        elif self.b6.isChecked():
+            btn_mode = 6
+        elif self.b8.isChecked():
+            btn_mode = 8
+        return btn_mode
+    
     def calculate(self):
         dj_power1 = self.dj_power1_input.text()
         dj_power2 = self.dj_power2_input.text()
@@ -164,10 +189,11 @@ class PowerApp(QWidget):
                         
                         if is_sc:
                             difficult = difficulty[2:]
-                        songs = filter_songs(songs_df, 4, int(difficult), is_sc)
+                        songs = filter_songs(songs_df, self.keyChecked(), int(difficult), is_sc)
                         
                         for song in songs.iterrows():
-                            recommand_songs.append((difficulty, song[1][SONGNAME_KEY], song[1][DLC_KEY]))
+                            if song[1][DLC_KEY] not in new_DLC:
+                                recommand_songs.append((difficulty, song[1][SONGNAME_KEY], song[1][DLC_KEY]))
                             
                     else:
                         basic_acc = "-"
@@ -187,10 +213,11 @@ class PowerApp(QWidget):
                         
                         if is_sc:
                             difficult = difficulty[2:]
-                        songs = filter_songs(songs_df, 4, int(difficult), is_sc)
+                        songs = filter_songs(songs_df, self.keyChecked(), int(difficult), is_sc)
                         
                         for song in songs.iterrows():
-                            recommand_songs.append((difficulty, song[1][SONGNAME_KEY], song[1][DLC_KEY]))
+                            if song[1][DLC_KEY] in new_DLC:
+                                recommand_songs.append((difficulty, song[1][SONGNAME_KEY], song[1][DLC_KEY]))
                     else:
                         new_acc = "-"
                         
@@ -199,15 +226,15 @@ class PowerApp(QWidget):
             else:
                 new_acc = "-"
             
-            recommand_songs.sort(reverse=True)
+            recommand_songs.sort(key=functools.cmp_to_key(compare))
             
             if difficulty in self.left_labels:
-                self.left_labels[difficulty].setText(f"{difficulty} :\t Basic: {basic_acc},\t New: {new_acc}")
+                self.left_labels[difficulty].setText(f"{difficulty} :\t Basic: {basic_acc},\t\t New: {new_acc}")
             else:
-                self.middle_labels[difficulty].setText(f"{difficulty} :\t Basic: {basic_acc},\t New: {new_acc}")
+                self.middle_labels[difficulty].setText(f"{difficulty} :\t Basic: {basic_acc},\t\t New: {new_acc}")
                 
         for song in recommand_songs:
-            self.recommend_list.addItem(f"{song[0]}\t{song[1]}\t\t{song[2]}")
+            self.recommend_list.addItem(f"{song[0]}\t{song[1]}\t{song[2]}")
         
 if __name__ == '__main__':
     # 정확도별 power

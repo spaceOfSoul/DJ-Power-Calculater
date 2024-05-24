@@ -23,5 +23,5 @@ def filter_songs(df, button_type, difficulty, is_sc):
 if __name__ == "__main__":
     df = load_dataframe('DJMAX RESPECT V 2.0 _ Pattern Data.xlsx')
     # print(df)
-    for i in filter_songs(df,4,15,True).iterrows():
+    for i in filter_songs(df,4,10,True).iterrows():
         print(i[1])

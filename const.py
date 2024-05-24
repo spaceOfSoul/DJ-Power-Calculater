@@ -8,13 +8,13 @@ difficulty_constant = {
     'SC11': 36,
     'SC10': 34,
     'SC9': 32,
-    'SC8': 30,
+    'SC8': 30, # 15
     'SC7': 29,
     'SC6': 28,
     'SC5': 27,
     'SC4': 26,
     'SC3': 25,
-    'SC2': 24,
+    'SC2': 24, # 12
     'SC1': 23,
     '15': 30,
     '14': 28,
@@ -32,3 +32,5 @@ difficulty_constant = {
     '2': 4,
     '1': 2
 }
+
+new_DLC = ["V EXTENSION 5","FALCOM"]
