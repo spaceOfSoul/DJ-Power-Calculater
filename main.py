@@ -1,5 +1,4 @@
 import sys
-import pandas as pd
 
 from CalculateModule import calculate_power
 from const import difficulty_constant, new_DLC
@@ -175,9 +174,10 @@ class PowerApp(QWidget):
             is_sc = False
             try:
                 int(difficulty)
+                # print()
             except ValueError:
                 is_sc = True
-                
+                # print()
                 
             if dj_power1:
                 try:
@@ -189,6 +189,9 @@ class PowerApp(QWidget):
                         
                         if is_sc:
                             difficult = difficulty[2:]
+                        else:
+                            difficult = difficulty
+                        print(is_sc)
                         songs = filter_songs(songs_df, self.keyChecked(), int(difficult), is_sc)
                         
                         for song in songs.iterrows():
@@ -213,6 +216,9 @@ class PowerApp(QWidget):
                         
                         if is_sc:
                             difficult = difficulty[2:]
+                        else:
+                            difficult = difficulty
+                            
                         songs = filter_songs(songs_df, self.keyChecked(), int(difficult), is_sc)
                         
                         for song in songs.iterrows():
